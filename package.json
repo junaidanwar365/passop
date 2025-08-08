@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server.js",
-    "heroku-postbuild": "npm run build"
+    "start": "vercel dev"
   },
   "dependencies": {
     "react": "^18.3.1",

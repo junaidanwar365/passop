@@ -11,7 +11,7 @@ const Manager = () => {
     const [passArray, setpassArray] = useState([])
 
     const getPasswords=async() => {
-      let req=await fetch("http://localhost:3000/api/passwords")
+      let req=await fetch("/api/passwords")
       let password=await req.json()
       setpassArray(password)
     }
@@ -50,7 +50,7 @@ const Manager = () => {
             // POST or PUT depending on whether it's a new entry or an edited entry
             const method = form.id ? "PUT" : "POST";
             
-            await fetch("http://localhost:3000/api/passwords", { 
+            await fetch("/api/passwords", { 
                 method: method, 
                 headers: { "Content-Type": "application/json" }, 
                 body: JSON.stringify(newPass) 
@@ -80,7 +80,7 @@ const Manager = () => {
     }
     const delPassword = async(id) => {
         setpassArray(passArray.filter(item => item.id != id))
-        await fetch("http://localhost:3000/api/passwords",{ method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({id}) })
+        await fetch("/api/passwords",{ method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({id}) })
         // localStorage.setItem("pass", JSON.stringify(passArray.filter(item => item.id !== id)))
     }
 
