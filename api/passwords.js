@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb";
+import { v4 as uuidv4 } from "uuid";
 
 const uri = process.env.MONGO_URI;
 let cachedClient = null;
@@ -11,7 +12,7 @@ async function connectToDatabase() {
 
   const client = new MongoClient(uri);
   await client.connect();
-  const db = client.db();
+  const db = client.db("myPassword"); // ✅ specify your DB name
 
   cachedClient = client;
   cachedDb = db;
@@ -20,38 +21,34 @@ async function connectToDatabase() {
 }
 
 export default async function handler(req, res) {
-  const { client, db } = await connectToDatabase();
-  const collection = db.collection("passOP");
-
   try {
-    switch (req.method) {
-      case 'GET':
-        const passwords = await collection.find({}).toArray();
-        res.status(200).json(passwords);
-        break;
+    const { db } = await connectToDatabase();
+    const collection = db.collection("passOP");
 
-      case 'POST':
-        const newPassword = req.body;
-        if (!newPassword.id) {
-          newPassword.id = require('uuid').v4();
-        }
-        const insertResult = await collection.insertOne(newPassword);
-        res.status(201).json(insertResult);
-        break;
-
-      case 'DELETE':
-        const deleteResult = await collection.deleteOne({ id: req.body.id });
-        res.status(200).json(deleteResult);
-        break;
-
-      default:
-        res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+    if (req.method === "GET") {
+      const passwords = await collection.find({}).toArray();
+      return res.status(200).json(passwords);
     }
+
+    if (req.method === "POST") {
+      const newPassword = req.body;
+      if (!newPassword.id) {
+        newPassword.id = uuidv4();
+      }
+      const insertResult = await collection.insertOne(newPassword);
+      return res.status(201).json(insertResult);
+    }
+
+    if (req.method === "DELETE") {
+      const deleteResult = await collection.deleteOne({ id: req.body.id });
+      return res.status(200).json(deleteResult);
+    }
+
+    res.setHeader("Allow", ["GET", "POST", "DELETE"]);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
-  } finally {
-    // Don't close connection in serverless environment
+    return res.status(500).json({ error: "Server error" });
   }
 }
