@@ -7,14 +7,18 @@
       "config": { "distDir": "dist" }
     },
     {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
+      "src": "api/passwords.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["node_modules/mongodb/**"]
+      }
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/passwords",
+      "methods": ["GET", "POST", "DELETE", "OPTIONS"],
+      "dest": "/api/passwords"
     },
     {
       "src": "/(.*)",
