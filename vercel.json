@@ -7,7 +7,7 @@
       "config": { "distDir": "dist" }
     },
     {
-      "src": "api/passwords.js",
+      "src": "/api/passwords.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": ["node_modules/mongodb/**"]
